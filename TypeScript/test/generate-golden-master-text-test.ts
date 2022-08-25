@@ -10,14 +10,13 @@ export function generateGoldenMasterTextTestFor (days: number = 2): string {
     new Item("Backstage passes to a TAFKAL80ETC concert", 15, 20),
     new Item("Backstage passes to a TAFKAL80ETC concert", 10, 49),
     new Item("Backstage passes to a TAFKAL80ETC concert", 5, 49),
-    // this conjured item does not work properly yet
     new Item("Conjured Mana Cake", 3, 6)];
-  
-  
+
+
   const gildedRose = new GildedRose(items);
 
   let text = '';
-  
+
   for (let i = 0; i < days; i++) {
     text += `-------- day ${i} --------\n`;
     text += 'name, sellIn, quality\n';
