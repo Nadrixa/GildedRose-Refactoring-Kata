@@ -4,85 +4,165 @@ namespace GildedRoseKata
 {
     public class GildedRose
     {
-        IList<Item> Items;
-        public GildedRose(IList<Item> Items)
+        readonly IList<Item> _items;
+        public GildedRose(IList<Item> items)
         {
-            this.Items = Items;
+            _items = items;
         }
 
         public void UpdateQuality()
         {
-            for (var i = 0; i < Items.Count; i++)
+            foreach (var item in _items)
             {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                {
-                    if (Items[i].Quality > 0)
-                    {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                        {
-                            Items[i].Quality = Items[i].Quality - 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
+                CreateGildedRoseItemFrom(item).Update();
+            }
+        }
 
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
+        private Regular CreateGildedRoseItemFrom(Item item)
+        {
+            return (item.Name) switch
+            {
+                "Aged Brie" => new AgedBrie(item),
+                "Backstage passes to a TAFKAL80ETC concert" => new BackstagePass(item),
+                "Sulfuras, Hand of Ragnaros" => new Sulfuras(item),
+                "Conjured" => new Conjured(item),
+                _ => new Regular(item)
+            };
+        }
 
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
-                }
+        private class Conjured : Regular
+        {
+            public Conjured(Item item) : base(item)
+            {
+            }
 
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
+            public override void Update()
+            {
+                DecreaseQuality();
+                DecreaseQuality();
+                DecreaseSellIn();
+                if(HasSellDateBeenPassed())
                 {
-                    Items[i].SellIn = Items[i].SellIn - 1;
+                    DecreaseQuality();
+                    DecreaseQuality();
+                }
+            }
+        }
+
+        private class Regular
+        {
+            protected readonly Item Item;
+
+            public Regular(Item item)
+            {
+                Item = item;
+            }
+
+            public virtual void Update()
+            {
+                DecreaseQuality();
+                DecreaseSellIn();
+                if (HasSellDateBeenPassed())
+                {
+                    DecreaseQuality();
+                }
+            }
+            
+            protected void DecreaseQuality()
+            {
+                if (Item.Quality > 0)
+                {
+                    Item.Quality -= 1;
+                }
+            }
+
+            protected bool HasSellDateBeenPassed()
+            {
+                return Item.SellIn < 0;
+            }
+
+            protected void DecreaseSellIn()
+            {
+                Item.SellIn -= 1;
+            }
+            
+            protected void IncreaseQuality()
+            {
+                if (Item.Quality < 50)
+                {
+                    Item.Quality += 1;
+                }
+            }
+        }
+
+        private class AgedBrie : Regular
+        {
+            
+            public AgedBrie(Item item) : base(item)
+            {
+            }
+            
+            public override void Update()
+            {
+                IncreaseQuality();
+                DecreaseSellIn();
+                if (HasSellDateBeenPassed())
+                {
+                    IncreaseQuality();
+                }
+            }
+        }
+
+        class BackstagePass : Regular
+        {
+
+            public BackstagePass(Item item) : base(item)
+            {
+            }
+
+            public override void Update()
+            {
+                IncreaseQuality();
+                if (isTheConcertBelowTheFirstThreshold())
+                {
+                    IncreaseQuality();
+                }
+                if (isTheConcertBelowSecondThreshold())
+                {
+                    IncreaseQuality();
+                }
+                DecreaseSellIn();
+
+                if (HasSellDateBeenPassed())
+                {
+                    clearItemQuality();
                 }
 
-                if (Items[i].SellIn < 0)
+                bool isTheConcertBelowTheFirstThreshold()
                 {
-                    if (Items[i].Name != "Aged Brie")
-                    {
-                        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                        }
-                    }
-                    else
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality = Items[i].Quality + 1;
-                        }
-                    }
+                    return Item.SellIn < 11;
                 }
+
+                bool isTheConcertBelowSecondThreshold()
+                {
+                    return Item.SellIn < 6;
+                }
+
+                void clearItemQuality()
+                {
+                    Item.Quality = 0;
+                }
+            }
+        }
+
+        class Sulfuras : Regular
+        {
+            public Sulfuras(Item item) : base(item)
+            {
+            }
+            
+            public override void Update()
+            {
             }
         }
     }

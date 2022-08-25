@@ -22,7 +22,9 @@ namespace GildedRoseTests
                 new() { Name = "Aged Brie", SellIn = 0, Quality = 1 },
                 new() { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 0, Quality = 1 },
                 new() { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 1, Quality = 1 },
-                new() { Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80 }
+                new() { Name = "Sulfuras, Hand of Ragnaros", SellIn = 0, Quality = 80 },
+                new() { Name = "Conjured", SellIn = 0, Quality = 4},
+                new() { Name = "Conjured", SellIn = 1, Quality = 2}
             };
             GildedRose app = new GildedRose(items);
             app.UpdateQuality();
